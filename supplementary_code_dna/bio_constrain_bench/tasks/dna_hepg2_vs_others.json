@@ -1,0 +1,54 @@
+{
+  "task_id": "dna_hepg2_vs_others",
+  "name": "HepG2 Cell-Type Selective Enhancer Activity",
+  "modality": "dna",
+  "alphabet": "ACGT",
+  "sequence_length_range": [150, 250],
+
+  "target_property": "hepG2",
+  "constraint_properties": ["k562", "sknsh"],
+
+  "tolerance": {
+    "type": "percent",
+    "value": 5.0,
+    "note": "Constraint oracles may drift at most ±5% from the start-sequence baseline. Matches the released DNA optimization runs."
+  },
+
+  "start_sequences_file": "data/dna/hepg2_start_sequences.csv",
+
+  "optimization_oracle": {
+    "type": "dna_cnn",
+    "model_class": "DNARegressor",
+    "note": "3-layer CNN (128→192→256 channels, global max pool). Trained with seed=42.",
+    "paths": {
+      "hepG2": "../Big_Oracles/DNA/cnn_dna_models/hepG2/best_model.pt",
+      "k562":  "../Big_Oracles/DNA/cnn_dna_models/k562/best_model.pt",
+      "sknsh": "../Big_Oracles/DNA/cnn_dna_models/sknsh/best_model.pt"
+    },
+    "normalization": {
+      "hepG2": "../Big_Oracles/DNA/cnn_dna_models/hepG2/normalization.npy",
+      "k562":  "../Big_Oracles/DNA/cnn_dna_models/k562/normalization.npy",
+      "sknsh": "../Big_Oracles/DNA/cnn_dna_models/sknsh/normalization.npy"
+    }
+  },
+
+  "evaluation_oracle": {
+    "type": "dna_cnn_v2",
+    "model_class": "DNARegressorV2",
+    "independent": true,
+    "note": "Larger 4-layer CNN (192→256→320→320, dual max+mean pool). Trained independently with seed=99 and a different train/val/test split to detect reward hacking.",
+    "paths": {
+      "hepG2": "../Big_Oracles/DNA/cnn_dna_models_v2/hepG2/best_model.pt",
+      "k562":  "../Big_Oracles/DNA/cnn_dna_models_v2/k562/best_model.pt",
+      "sknsh": "../Big_Oracles/DNA/cnn_dna_models_v2/sknsh/best_model.pt"
+    },
+    "normalization": {
+      "hepG2": "../Big_Oracles/DNA/cnn_dna_models_v2/hepG2/normalization.npy",
+      "k562":  "../Big_Oracles/DNA/cnn_dna_models_v2/k562/normalization.npy",
+      "sknsh": "../Big_Oracles/DNA/cnn_dna_models_v2/sknsh/normalization.npy"
+    }
+  },
+
+  "biology_note": "DNA enhancer sequences from the STARR-seq assay (Bergman et al. 2022). hepG2 is a hepatocellular carcinoma line with active HNF/FOXA liver regulatory programs. The task challenges the optimizer to increase liver-specific enhancer activity while preserving regulatory grammar in the leukemia (k562) and neuroblastoma (SK-N-SH) contexts. Clinically relevant for liver-targeted gene therapy vectors.",
+  "dataset_citation": "Bergman et al. (2022). Assessing the functionality of genomic regions. Nature Genetics."
+}

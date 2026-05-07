@@ -1,0 +1,54 @@
+{
+  "task_id": "dna_sknsh_vs_others",
+  "name": "SK-N-SH Cell-Type Selective Enhancer Activity",
+  "modality": "dna",
+  "alphabet": "ACGT",
+  "sequence_length_range": [150, 250],
+
+  "target_property": "sknsh",
+  "constraint_properties": ["hepG2", "k562"],
+
+  "tolerance": {
+    "type": "percent",
+    "value": 5.0,
+    "note": "Constraint oracles may drift at most ±5% from the start-sequence baseline. Matches the released DNA optimization runs."
+  },
+
+  "start_sequences_file": "data/dna/sknsh_start_sequences.csv",
+
+  "optimization_oracle": {
+    "type": "dna_cnn",
+    "model_class": "DNARegressor",
+    "note": "3-layer CNN (128→192→256 channels, global max pool). Trained with seed=42.",
+    "paths": {
+      "sknsh": "../Big_Oracles/DNA/cnn_dna_models/sknsh/best_model.pt",
+      "hepG2": "../Big_Oracles/DNA/cnn_dna_models/hepG2/best_model.pt",
+      "k562":  "../Big_Oracles/DNA/cnn_dna_models/k562/best_model.pt"
+    },
+    "normalization": {
+      "sknsh": "../Big_Oracles/DNA/cnn_dna_models/sknsh/normalization.npy",
+      "hepG2": "../Big_Oracles/DNA/cnn_dna_models/hepG2/normalization.npy",
+      "k562":  "../Big_Oracles/DNA/cnn_dna_models/k562/normalization.npy"
+    }
+  },
+
+  "evaluation_oracle": {
+    "type": "dna_cnn_v2",
+    "model_class": "DNARegressorV2",
+    "independent": true,
+    "note": "Larger 4-layer CNN (192→256→320→320, dual max+mean pool). Trained independently with seed=99 and a different train/val/test split to detect reward hacking.",
+    "paths": {
+      "sknsh": "../Big_Oracles/DNA/cnn_dna_models_v2/sknsh/best_model.pt",
+      "hepG2": "../Big_Oracles/DNA/cnn_dna_models_v2/hepG2/best_model.pt",
+      "k562":  "../Big_Oracles/DNA/cnn_dna_models_v2/k562/best_model.pt"
+    },
+    "normalization": {
+      "sknsh": "../Big_Oracles/DNA/cnn_dna_models_v2/sknsh/normalization.npy",
+      "hepG2": "../Big_Oracles/DNA/cnn_dna_models_v2/hepG2/normalization.npy",
+      "k562":  "../Big_Oracles/DNA/cnn_dna_models_v2/k562/normalization.npy"
+    }
+  },
+
+  "biology_note": "DNA enhancer sequences from the STARR-seq assay (Bergman et al. 2022). SK-N-SH is a human neuroblastoma cell line with active neural-crest regulatory programs (SOX, PHOX2B elements). The task challenges the optimizer to increase neuronal enhancer activity while preserving regulatory grammar in liver (hepG2) and leukemia (k562) contexts. Relevant for CNS-targeted gene therapy and understanding neural-specific cis-regulatory evolution.",
+  "dataset_citation": "Bergman et al. (2022). Assessing the functionality of genomic regions. Nature Genetics."
+}
