@@ -22,13 +22,7 @@ All large assets are centralized under:
 
 `data/`
 
-This directory can be hosted separately from the repository.
-The code in this package looks in `data/...` first for:
-
-- oracle training datasets
-- trained oracle artifacts
-- validation-oracle artifacts
-- optimization result JSONs
+Please download the data needed to run dna_optimization from : https://drive.google.com/file/d/1uiubyhXh10nnawDdMMvB4U_czYzkb_VW/view?usp=sharing
 
 ## Included
 
